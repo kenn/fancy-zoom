@@ -33,44 +33,59 @@ var FancyZoomBox = {
   zooming   : false,
   setup     : false,
   
-  init: function(directory) {
+  init: function(is_edgy, directory) {
     if (FancyZoomBox.setup) return;
     FancyZoomBox.setup = true;
-    
+		
+		// Let's set the box padding differently if we're using the edgy version
+		extraWidth	=	(is_edgy) ? 40 : 60;
+		extraHeight	=	(is_edgy) ? 40 : 60;
+		
     var ie = navigator.userAgent.match(/MSIE\s(\d)+/);
-    if (ie) {
+    if (ie && !is_edgy) {
       var version = parseInt(ie[1]);
       Prototype.Browser['IE' + version.toString()] = true;
       Prototype.Browser.ltIE7 = (version < 7) ? true : false;
     }
     
-    var html = '<div id="zoom" style="display:none;"> \
-                  <table id="zoom_table" style="border-collapse:collapse; width:100%; height:100%;"> \
-                    <tbody> \
-                      <tr> \
-                        <td class="tl" style="background:url(' + FancyZoomBox.directory + '/tl.png) 0 0 no-repeat; width:20px height:20px; overflow:hidden;" /> \
-                        <td class="tm" style="background:url(' + FancyZoomBox.directory + '/tm.png) 0 0 repeat-x; height:20px; overflow:hidden;" /> \
-                        <td class="tr" style="background:url(' + FancyZoomBox.directory + '/tr.png) 100% 0 no-repeat; width:20px height:20px; overflow:hidden;" /> \
-                      </tr> \
-                      <tr> \
-                        <td class="ml" style="background:url(' + FancyZoomBox.directory + '/ml.png) 0 0 repeat-y; width:20px; overflow:hidden;" /> \
-                        <td class="mm" style="background:#fff; vertical-align:top; padding:10px;"> \
-                          <div id="zoom_content"> \
-                          </div> \
-                        </td> \
-                        <td class="mr" style="background:url(' + FancyZoomBox.directory + '/mr.png) 100% 0 repeat-y;  width:20px; overflow:hidden;" /> \
-                      </tr> \
-                      <tr> \
-                        <td class="bl" style="background:url(' + FancyZoomBox.directory + '/bl.png) 0 100% no-repeat; width:20px height:20px; overflow:hidden;" /> \
-                        <td class="bm" style="background:url(' + FancyZoomBox.directory + '/bm.png) 0 100% repeat-x; height:20px; overflow:hidden;" /> \
-                        <td class="br" style="background:url(' + FancyZoomBox.directory + '/br.png) 100% 100% no-repeat; width:20px height:20px; overflow:hidden;" /> \
-                      </tr> \
-                    </tbody> \
-                  </table> \
-                  <a href="#" title="Close" id="zoom_close" style="position:absolute; top:0; left:0;"> \
-                    <img src="' + FancyZoomBox.directory + '/closebox.png" alt="Close" style="border:none; margin:0; padding:0;" /> \
-                  </a> \
-                </div>';
+		if(is_edgy) {
+			var html = '<div id="zoom" class="edgy" style="display:none;"> \
+										<div id="zoom_content"> \
+											\
+										</div> <!-- /zoom_content --> \
+										<a href="#" title="Close" id="zoom_close"> \
+											<img src="' + FancyZoomBox.directory + '/closebox.png" alt="Close" /> \
+										</a> \
+									</div> <!-- /zoom -->';
+		} else {
+    	var html = '<div id="zoom" style="display:none;"> \
+	                  <table id="zoom_table" style="border-collapse:collapse; width:100%; height:100%;"> \
+	                    <tbody> \
+	                      <tr> \
+	                        <td class="tl" style="background:url(' + FancyZoomBox.directory + '/tl.png) 0 0 no-repeat; width:20px height:20px; overflow:hidden;" /> \
+	                        <td class="tm" style="background:url(' + FancyZoomBox.directory + '/tm.png) 0 0 repeat-x; height:20px; overflow:hidden;" /> \
+	                        <td class="tr" style="background:url(' + FancyZoomBox.directory + '/tr.png) 100% 0 no-repeat; width:20px height:20px; overflow:hidden;" /> \
+	                      </tr> \
+	                      <tr> \
+	                        <td class="ml" style="background:url(' + FancyZoomBox.directory + '/ml.png) 0 0 repeat-y; width:20px; overflow:hidden;" /> \
+	                        <td class="mm" style="background:#fff; vertical-align:top; padding:10px;"> \
+	                          <div id="zoom_content"> \
+	                          </div> \
+	                        </td> \
+	                        <td class="mr" style="background:url(' + FancyZoomBox.directory + '/mr.png) 100% 0 repeat-y;  width:20px; overflow:hidden;" /> \
+	                      </tr> \
+	                      <tr> \
+	                        <td class="bl" style="background:url(' + FancyZoomBox.directory + '/bl.png) 0 100% no-repeat; width:20px height:20px; overflow:hidden;" /> \
+	                        <td class="bm" style="background:url(' + FancyZoomBox.directory + '/bm.png) 0 100% repeat-x; height:20px; overflow:hidden;" /> \
+	                        <td class="br" style="background:url(' + FancyZoomBox.directory + '/br.png) 100% 100% no-repeat; width:20px height:20px; overflow:hidden;" /> \
+	                      </tr> \
+	                    </tbody> \
+	                  </table> \
+	                  <a href="#" title="Close" id="zoom_close" style="position:absolute; top:0; left:0;"> \
+	                    <img src="' + FancyZoomBox.directory + '/closebox.png" alt="Close" style="border:none; margin:0; padding:0;" /> \
+	                  </a> \
+	                </div>';
+		}
     
     var body  = $$('body').first();
     body.insert(html);
@@ -80,8 +95,10 @@ var FancyZoomBox = {
     FancyZoomBox.zoom_close = $('zoom_close');
     FancyZoomBox.zoom_content = $('zoom_content');
     FancyZoomBox.zoom_close.observe('click', FancyZoomBox.hide);
-    FancyZoomBox.middle_row = $A([$$('td.ml'), $$('td.mm'), $$('td.mr')]).flatten();
-    FancyZoomBox.cells = FancyZoomBox.zoom_table.select('td');
+		if (!is_edgy) {
+			FancyZoomBox.middle_row = $A([$$('td.ml'), $$('td.mm'), $$('td.mr')]).flatten();
+	    FancyZoomBox.cells = FancyZoomBox.zoom_table.select('td');
+		};
     
     // hide zoom if click fired is not inside zoom
     $$('html').first().observe('click', function(e) {
@@ -101,7 +118,7 @@ var FancyZoomBox = {
     });
     
     // just use gifs as ie6 and below suck
-    if (Prototype.Browser.ltIE7) {
+    if (Prototype.Browser.ltIE7 && !is_edgy) {
       FancyZoomBox.switchBackgroundImagesTo('gif');
     }    
   },
@@ -112,8 +129,8 @@ var FancyZoomBox = {
 		FancyZoomBox.zooming   = true;
 		var element            = e.findElement('a');
 		var related_div        = element.content_div;
-		var width              = (element.zoom_width || related_div.getWidth()) + 60;
-		var height             = (element.zoom_height || related_div.getHeight()) + 60;
+		var width              = (element.zoom_width || related_div.getWidth()) + extraWidth;
+		var height             = (element.zoom_height || related_div.getHeight()) + extraHeight;
 		var d                  = Window.size();
 		var yOffset            = document.viewport.getScrollOffsets()[1];
 		// ensure that newTop is at least 0 so it doesn't hide close button
@@ -208,7 +225,9 @@ var FancyZoomBox = {
 var FancyZoom = Class.create({
 	initialize: function(element) {
 	  this.options = arguments.length > 1 ? arguments[1] : {};
-	  FancyZoomBox.init();
+		this.edgy = (this.options.edgy) ? true : false;
+		console.log('edgy? '+this.edgy);
+	  FancyZoomBox.init(this.edgy);
 	  this.element = $(element);
 		if (this.element) {
 		  this.element.content_div = $(this.element.readAttribute('href').gsub(/^#/, ''));

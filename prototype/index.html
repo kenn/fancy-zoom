@@ -9,7 +9,7 @@
 	<script type="text/javascript" src="js/fancyzoom.js"></script>
 	<script type="text/javascript" charset="utf-8">
 		$(document).observe('dom:loaded', function() {
-			$$("div.photo a").each(function(el) { new FancyZoom(el); })
+			$$("div.photo a").each(function(el) { new FancyZoom(el, {edgy:true}); })
 			new FancyZoom('medium_box_link', {width:400, height:300});
 			new FancyZoom('large_box_link');
 			new FancyZoom('flash_box_link');
