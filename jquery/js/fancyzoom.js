@@ -12,7 +12,6 @@ jQuery.fn.fancyZoom = function(options){
   if ($('#zoom').length == 0) {
 		switch(is_edgy) {
 			case true:
-			console.log('test');
 				var html = '<div id="zoom" class="edgy" style="display:none;"> \
 											<div id="zoom_content"> \
 											</div> <!-- /zoom_content --> \
