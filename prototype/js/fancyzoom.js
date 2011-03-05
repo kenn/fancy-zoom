@@ -133,7 +133,7 @@ var FancyZoomBox = {
 		var width              = (element.zoom_width || related_div.getWidth()) + extraWidth;
 		var height             = (element.zoom_height || related_div.getHeight()) + extraHeight;
 		var d                  = Window.size();
-		var yOffset            = document.viewport.getScrollOffsets()[1];
+		var yOffset            = (element.additional_styles && element.additional_styles.position == 'fixed') ? 0 : document.viewport.getScrollOffsets()[1];
 		// ensure that newTop is at least 0 so it doesn't hide close button
 		var newTop             = Math.max((d.height/2) - (height/2) + yOffset, 0);
 		var newLeft            = (d.width/2) - (width/2);
