@@ -141,11 +141,11 @@ var FancyZoomBox = {
 		FancyZoomBox.curLeft   = e.pointerX();
 		FancyZoomBox.moveX     = -(FancyZoomBox.curLeft - newLeft);
 		FancyZoomBox.moveY     = -(FancyZoomBox.curTop - newTop);
-    FancyZoomBox.zoom.hide().setStyle({
+    FancyZoomBox.zoom.hide().setStyle(Object.extend({
 			position	: 'absolute',
 			top				: FancyZoomBox.curTop.px(),
 			left			: FancyZoomBox.curLeft.px()
-		});
+		}, element.additional_styles));
     
 		new Effect.Parallel([
 			new Effect.Appear(FancyZoomBox.zoom, {sync:true}),
@@ -234,6 +234,7 @@ var FancyZoom = Class.create({
   		this.element.content_div.hide();
   		this.element.zoom_width = this.options.width;
   		this.element.zoom_height = this.options.height;
+  		this.element.additional_styles = this.options.additional_styles;
       this.element.observe('click', FancyZoomBox.show);
 		}
 	}
